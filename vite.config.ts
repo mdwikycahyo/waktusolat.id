@@ -14,7 +14,7 @@ export default defineConfig({
         short_name: "WaktuSolat",
         start_url: "/",
         display: "standalone",
-        background_color: "#003167",
+        background_color: "#FFFFFF",
         theme_color: "#000000",
         description: "Jadwal sholat harian untuk Jakarta dan sekitarnya.",
         icons: [
