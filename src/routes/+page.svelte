@@ -110,7 +110,7 @@
                     alt="Current prayer icon"
                     class="h-6 w-6"
                   />
-                  <span>Sekarang</span>
+                  <span>{prayer.currentInfo ? prayer.currentInfo : 'Sekarang'}</span>
                 </div>
               {/if}
               {#if prayer.timeUntil}

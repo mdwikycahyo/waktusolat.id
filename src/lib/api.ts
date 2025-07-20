@@ -6,6 +6,7 @@ export interface PrayerTime {
   isNext: boolean;
   hasSound: boolean;
   timeUntil?: string;
+  currentInfo?: string;
 }
 
 // Partial type for API response (for clarity)
@@ -19,6 +20,7 @@ interface JadwalSholatApiResponse {
       ashar: string;
       maghrib: string;
       isya: string;
+      terbit: string;
     };
   };
 }
@@ -55,14 +57,28 @@ export async function getPrayerTimes(date: string, nowJakarta: Date): Promise<Pr
     return dt;
   });
 
+  // Get terbit time as Date
+  const [terbitHour, terbitMinute] = jadwal.terbit.split(":").map(Number);
+  const terbitDate = new Date(nowJakarta);
+  terbitDate.setHours(terbitHour, terbitMinute, 0, 0);
+
+  // Check if now is after Isya
+  const isyaIdx = prayers.length - 1;
+  const isAfterIsya = nowJakarta >= prayerDateTimes[isyaIdx];
+
   let foundNext = false;
   let nextPrayerIdx = -1;
-  prayers.forEach((p, i) => {
-    if (!foundNext && nowJakarta < prayerDateTimes[i]) {
-      nextPrayerIdx = i;
-      foundNext = true;
-    }
-  });
+  if (!isAfterIsya) {
+    prayers.forEach((p, i) => {
+      if (!foundNext && nowJakarta < prayerDateTimes[i]) {
+        nextPrayerIdx = i;
+        foundNext = true;
+      }
+    });
+  } else {
+    // After Isya, next prayer is Subuh (index 0)
+    nextPrayerIdx = 0;
+  }
 
   function formatTimeUntil(ms: number) {
     const totalMinutes = Math.round(ms / 60000);
@@ -80,19 +96,42 @@ export async function getPrayerTimes(date: string, nowJakarta: Date): Promise<Pr
     let isCurrent = false;
     let isNext = false;
     let timeUntil;
+    let currentInfo;
     const thisTime = prayerDateTimes[i];
     const nextTime = prayerDateTimes[i + 1] || null;
-    if (nextTime) {
-      isCurrent = nowJakarta >= thisTime && nowJakarta < nextTime;
-    } else {
-      // Last prayer: isCurrent if after this time
-      isCurrent = nowJakarta >= thisTime;
+    if (p.name === "Subuh") {
+      // Subuh is current if now is between Subuh and Terbit
+      if (nowJakarta >= thisTime && nowJakarta < terbitDate) {
+        isCurrent = true;
+        currentInfo = `Sekarang sampai ${jadwal.terbit} waktu terbit`;
+      }
+    } else if (!isAfterIsya) {
+      if (nextTime) {
+        isCurrent = nowJakarta >= thisTime && nowJakarta < nextTime;
+      } else {
+        // Last prayer: isCurrent if after this time
+        isCurrent = nowJakarta >= thisTime;
+      }
     }
-    if (i === nextPrayerIdx) {
-      isNext = true;
-      const diff = thisTime.getTime() - nowJakarta.getTime();
-      if (diff > 0) {
-        timeUntil = formatTimeUntil(diff);
+    if (!isAfterIsya) {
+      if (i === nextPrayerIdx) {
+        isNext = true;
+        const diff = thisTime.getTime() - nowJakarta.getTime();
+        if (diff > 0) {
+          timeUntil = formatTimeUntil(diff);
+        }
+      }
+    } else {
+      // After Isya: next prayer is Subuh (index 0)
+      if (i === 0) {
+        isNext = true;
+        // Calculate tomorrow's Subuh time
+        const subuhTomorrow = new Date(prayerDateTimes[0]);
+        subuhTomorrow.setDate(subuhTomorrow.getDate() + 1);
+        const diff = subuhTomorrow.getTime() - nowJakarta.getTime();
+        if (diff > 0) {
+          timeUntil = formatTimeUntil(diff);
+        }
       }
     }
     return {
@@ -102,6 +141,7 @@ export async function getPrayerTimes(date: string, nowJakarta: Date): Promise<Pr
       isNext,
       hasSound: false,
       timeUntil,
+      currentInfo,
     };
   });
 
