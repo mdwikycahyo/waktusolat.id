@@ -10,26 +10,26 @@ export default defineConfig({
 		VitePWA({
 			registerType: 'autoUpdate',
 			manifest: {
-				name: 'Waktu Solat',
-				short_name: 'WaktuSolat',
-				start_url: '/',
-				display: 'standalone',
-				background_color: '#000000',
-				theme_color: '#000000',
-				description: 'Jadwal sholat harian untuk Jakarta dan sekitarnya.',
-				icons: [
-					{
-						src: '/waktusolat.id.webp',
-						sizes: '192x192',
-						type: 'image/webp'
-					},
-					{
-						src: '/waktusolat.id.webp',
-						sizes: '512x512',
-						type: 'image/webp'
-					}
+				"name": "waktusolat.id",
+				"short_name": "WaktuSolat",
+				"start_url": "/",
+				"display": "standalone",
+				"background_color": "#003167",
+				"theme_color": "#000000",
+				"description": "Jadwal sholat harian untuk Jakarta dan sekitarnya.",
+				"icons": [
+				  {
+					"src": "/waktusolat.id.splash.png",
+					"sizes": "192x192",
+					"type": "image/png"
+				  },
+				  {
+					"src": "/waktusolat.id.splash.png",
+					"sizes": "512x512",
+					"type": "image/png"
+				  }
 				]
-			}
+			  } 
 		})
 	]
 });
