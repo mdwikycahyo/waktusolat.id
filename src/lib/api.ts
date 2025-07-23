@@ -103,7 +103,7 @@ export async function getPrayerTimes(date: string, nowJakarta: Date): Promise<Pr
       // Subuh is current if now is between Subuh and Terbit
       if (nowJakarta >= thisTime && nowJakarta < terbitDate) {
         isCurrent = true;
-        currentInfo = `Sekarang sampai ${jadwal.terbit} waktu terbit`;
+        currentInfo = `Sampai ${jadwal.terbit}`;
       }
     } else if (!isAfterIsya) {
       if (nextTime) {
