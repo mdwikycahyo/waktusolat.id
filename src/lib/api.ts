@@ -105,11 +105,11 @@ export async function getPrayerTimes(date: string, nowJakarta: Date): Promise<Pr
         isCurrent = true;
         currentInfo = `Sampai ${jadwal.terbit}`;
       }
-    } else if (!isAfterIsya) {
+    } else {
       if (nextTime) {
         isCurrent = nowJakarta >= thisTime && nowJakarta < nextTime;
       } else {
-        // Last prayer: isCurrent if after this time
+        // Last prayer (Isya): isCurrent if after this time
         isCurrent = nowJakarta >= thisTime;
       }
     }
